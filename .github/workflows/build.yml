@@ -33,3 +33,21 @@ jobs:
         run: |
           gcc -I main test/host/test_reset_reason.c main/reset_reason.c -o /tmp/test_reset_reason
           /tmp/test_reset_reason
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install analysis tools
+        run: sudo apt-get update && sudo apt-get install -y clang-format cppcheck
+
+      - name: Check formatting
+        run: clang-format --dry-run --Werror main/*.c main/*.h
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all --suppress=missingInclude \
+            --suppress=missingIncludeSystem --suppress=unusedFunction main/
