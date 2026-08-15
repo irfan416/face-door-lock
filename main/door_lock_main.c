@@ -5,6 +5,8 @@
 #include "esp_flash.h"
 #include "esp_log.h"
 #include "esp_system.h"
+#include "led.h"
+#include "led_pattern.h"
 #include "reset_reason.h"
 
 static const char* TAG = "door_lock";
@@ -50,4 +52,8 @@ void app_main(void) {
     }
 
     ESP_LOGI(TAG, "Minimum free heap: %" PRIu32 " bytes", esp_get_minimum_free_heap_size());
+
+    led_init();
+    led_set(true);  // solid on = idle state, per LED_PATTERN_IDLE
+    ESP_LOGI(TAG, "Status LED initialized (idle pattern)");
 }
