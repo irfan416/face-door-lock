@@ -10,6 +10,6 @@ typedef enum {
 } door_lock_reset_reason_t;
 
 // Converts a reset reason into a human-readable string for logging/reporting (FR-008).
-const char *reset_reason_to_string(door_lock_reset_reason_t reason);
+const char* reset_reason_to_string(door_lock_reset_reason_t reason);
 
 #endif
