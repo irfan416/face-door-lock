@@ -1,6 +1,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "bme280.h"
+#include "bme280_check.h"
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_log.h"
@@ -19,6 +21,7 @@ static door_lock_reset_reason_t map_esp_reset_reason(esp_reset_reason_t reason) 
         case ESP_RST_POWERON:
             return RESET_REASON_POWER_ON;
         case ESP_RST_SW:
+        case ESP_RST_USB:
             return RESET_REASON_SOFTWARE;
         case ESP_RST_TASK_WDT:
         case ESP_RST_INT_WDT:
@@ -56,4 +59,15 @@ void app_main(void) {
     led_init();
     led_set(true);  // solid on = idle state, per LED_PATTERN_IDLE
     ESP_LOGI(TAG, "Status LED initialized (idle pattern)");
+
+    if (bme280_init()) {
+        uint8_t chip_id;
+        if (bme280_read_chip_id(&chip_id) && bme280_chip_id_is_valid(chip_id)) {
+            ESP_LOGI(TAG, "BME280 detected (chip ID 0x%02X)", chip_id);
+        } else {
+            ESP_LOGE(TAG, "BME280 chip ID check failed");
+        }
+    } else {
+        ESP_LOGE(TAG, "BME280 I2C init failed");
+    }
 }
