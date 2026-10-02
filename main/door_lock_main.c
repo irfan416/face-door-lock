@@ -3,6 +3,7 @@
 
 #include "bme280.h"
 #include "bme280_check.h"
+#include "camera.h"
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_log.h"
@@ -56,10 +57,24 @@ void app_main(void) {
 
     ESP_LOGI(TAG, "Minimum free heap: %" PRIu32 " bytes", esp_get_minimum_free_heap_size());
 
+#ifdef CONFIG_TARGET_BOARD_EYE
     led_init();
     led_set(true);  // solid on = idle state, per LED_PATTERN_IDLE
     ESP_LOGI(TAG, "Status LED initialized (idle pattern)");
 
+    if (camera_init()) {
+        ESP_LOGI(TAG, "Camera initialized");
+        if (camera_capture_test_frame()) {
+            ESP_LOGI(TAG, "Camera capture test passed");
+        } else {
+            ESP_LOGE(TAG, "Camera capture test failed");
+        }
+    } else {
+        ESP_LOGE(TAG, "Camera init failed");
+    }
+#endif
+
+#ifdef CONFIG_TARGET_BOARD_BRINGUP
     if (bme280_init()) {
         uint8_t chip_id;
         if (bme280_read_chip_id(&chip_id) && bme280_chip_id_is_valid(chip_id)) {
@@ -70,4 +85,5 @@ void app_main(void) {
     } else {
         ESP_LOGE(TAG, "BME280 I2C init failed");
     }
+#endif
 }
