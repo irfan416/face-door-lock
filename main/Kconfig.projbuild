@@ -1,0 +1,10 @@
+menu "Door Lock Board Configuration"
+    choice TARGET_BOARD
+        prompt "Target hardware"
+        default TARGET_BOARD_EYE
+        config TARGET_BOARD_EYE
+            bool "ESP32-S3-EYE (camera + LED)"
+        config TARGET_BOARD_BRINGUP
+            bool "Freenove bring-up board (BME280 + buttons)"
+    endchoice
+endmenu

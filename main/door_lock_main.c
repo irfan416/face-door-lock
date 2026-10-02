@@ -57,20 +57,10 @@ void app_main(void) {
 
     ESP_LOGI(TAG, "Minimum free heap: %" PRIu32 " bytes", esp_get_minimum_free_heap_size());
 
+#ifdef CONFIG_TARGET_BOARD_EYE
     led_init();
     led_set(true);  // solid on = idle state, per LED_PATTERN_IDLE
     ESP_LOGI(TAG, "Status LED initialized (idle pattern)");
-
-    if (bme280_init()) {
-        uint8_t chip_id;
-        if (bme280_read_chip_id(&chip_id) && bme280_chip_id_is_valid(chip_id)) {
-            ESP_LOGI(TAG, "BME280 detected (chip ID 0x%02X)", chip_id);
-        } else {
-            ESP_LOGE(TAG, "BME280 chip ID check failed");
-        }
-    } else {
-        ESP_LOGE(TAG, "BME280 I2C init failed");
-    }
 
     if (camera_init()) {
         ESP_LOGI(TAG, "Camera initialized");
@@ -82,4 +72,18 @@ void app_main(void) {
     } else {
         ESP_LOGE(TAG, "Camera init failed");
     }
+#endif
+
+#ifdef CONFIG_TARGET_BOARD_BRINGUP
+    if (bme280_init()) {
+        uint8_t chip_id;
+        if (bme280_read_chip_id(&chip_id) && bme280_chip_id_is_valid(chip_id)) {
+            ESP_LOGI(TAG, "BME280 detected (chip ID 0x%02X)", chip_id);
+        } else {
+            ESP_LOGE(TAG, "BME280 chip ID check failed");
+        }
+    } else {
+        ESP_LOGE(TAG, "BME280 I2C init failed");
+    }
+#endif
 }
