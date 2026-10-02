@@ -3,6 +3,7 @@
 
 #include "bme280.h"
 #include "bme280_check.h"
+#include "camera.h"
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_log.h"
@@ -69,5 +70,16 @@ void app_main(void) {
         }
     } else {
         ESP_LOGE(TAG, "BME280 I2C init failed");
+    }
+
+    if (camera_init()) {
+        ESP_LOGI(TAG, "Camera initialized");
+        if (camera_capture_test_frame()) {
+            ESP_LOGI(TAG, "Camera capture test passed");
+        } else {
+            ESP_LOGE(TAG, "Camera capture test failed");
+        }
+    } else {
+        ESP_LOGE(TAG, "Camera init failed");
     }
 }
