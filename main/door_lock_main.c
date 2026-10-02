@@ -3,11 +3,14 @@
 
 #include "bme280.h"
 #include "bme280_check.h"
+#include "button.h"
 #include "camera.h"
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_log.h"
 #include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "led.h"
 #include "led_pattern.h"
 #include "reset_reason.h"
@@ -71,6 +74,18 @@ void app_main(void) {
         }
     } else {
         ESP_LOGE(TAG, "Camera init failed");
+    }
+    if (button_init()) {
+        ESP_LOGI(TAG, "Button ADC initialized -- hold a button now, logging for 10s");
+        for (int i = 0; i < 10; i++) {
+            door_lock_button_t btn = button_read_debounced();
+            if (btn != BUTTON_NONE) {
+                ESP_LOGI(TAG, "Button detected: %d", btn);
+            }
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+    } else {
+        ESP_LOGE(TAG, "Button init failed");
     }
 #endif
 
